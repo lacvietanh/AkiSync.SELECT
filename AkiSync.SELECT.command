@@ -169,6 +169,7 @@ sync() {
         if [ -d "$dir" ]; then
             ((c = c + 1))
             rsync -haur "${source}/${dir}" "$dest" &
+            mkdir -pv "${dest}/${dir}"
             echo -e "$!|$dir" >>"${listPID}"
         fi
     done
