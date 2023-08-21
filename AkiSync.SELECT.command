@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script Author: Lac Viet Anh
-# Version: 2023.08.21-10:57
+# Version: 2023.08.21
 # AkiWorkflow.com
 
 CL_RS='\033[0m'   # Reset
@@ -66,7 +66,7 @@ ask() {
         #Build Nexus3 Library Structure:
         source="/Volumes/$mountName/Library/AudioLibrary/NexusLibrary"
         dest=/Volumes/AkiWorkflow/Library/AudioLibrary/
-        rsync -havu --exclude 'Samples/*' "${source}" "${dest}"
+        rsync -Phavu --exclude 'Samples/*' "${source}" "${dest}"
         source="/Volumes/$mountName/Library/AudioLibrary/NexusLibrary/Samples"
         dest=/Volumes/AkiWorkflow/Library/AudioLibrary/NexusLibrary/Samples/
         ;;
@@ -168,8 +168,8 @@ sync() {
     for dir in *; do
         if [ -d "$dir" ]; then
             ((c = c + 1))
+            echo -e "+1 Folder: ${CL_Y}${dir}${CL_RS}\n\t->${CL_C}${dest}${CL_RS}"
             rsync -haur "${source}/${dir}" "$dest" &
-            mkdir -pv "${dest}/${dir}"
             echo -e "$!|$dir" >>"${listPID}"
         fi
     done
@@ -187,8 +187,8 @@ monitor() {
     for JobLine in "${JOBS[@]}"; do
         _name=$(echo "$JobLine" | cut -d "|" -f 2)
         _pid=$(echo "$JobLine" | cut -d "|" -f 1)
+        mkdir -pv "${dest}/${_name}"
         _size=$(du -sh "${dest}/${_name}" | cut -f 1 -d "/" | xargs)
-        # _size=$(fsize "${dest}/${_name}")
         ps -p $_pid >/dev/null
         [ $? == 0 ] && _status="${CL_C}Syncing.." || _status="${CL_G}Finished!"
         echo -e "${_status}\t${_size}\t${_name}${CL_RS}" >>$LogFile
